@@ -1,0 +1,71 @@
+// TrueDate root Smart Contract.sb
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+interface LoveToken {
+    function balanceOf(address account) external view returns (uint256);
+}
+
+contract DatingApp {
+    address public owner;
+    address public loveTokenAddress = 0x57C75052209e0F094899632a51679cD9D0E4f3f8;
+    LoveToken public loveToken;
+    
+    struct User {
+        bool exists;
+        bool isActive;
+        mapping(address => bool) likedUsers;
+    }
+    
+    mapping(address => User) public users;
+    mapping(address => mapping(address => bool)) public matches;
+    
+    event UserAdded(address indexed user);
+    event UserRemoved(address indexed user);
+    event Liked(address indexed user, address indexed likedUser);
+    event Matched(address indexed user1, address indexed user2);
+    
+    modifier onlyOwner() {
+        require(msg.sender == owner, "Only owner can call this function");
+        _;
+    }
+    
+    constructor() {
+        owner = msg.sender;
+        loveToken = LoveToken(loveTokenAddress);
+    }
+    
+    function addUserFromWebsite() external {
+        require(!users[msg.sender].exists, "User already exists");
+        users[msg.sender].exists = true;
+        users[msg.sender].isActive = true;
+        emit UserAdded(msg.sender);
+    }
+    
+    function removeUser() external {
+        require(users[msg.sender].exists, "User does not exist");
+        users[msg.sender].isActive = false;
+        emit UserRemoved(msg.sender);
+    }
+    
+    function likeUser(address _likedUser) external {
+        require(users[msg.sender].exists, "User does not exist");
+        require(users[msg.sender].isActive, "User is not active");
+        require(users[_likedUser].exists, "Liked user does not exist");
+        require(users[_likedUser].isActive, "Liked user is not active");
+        require(!users[msg.sender].likedUsers[_likedUser], "Already liked");
+        
+        users[msg.sender].likedUsers[_likedUser] = true;
+        emit Liked(msg.sender, _likedUser);
+        
+        if (users[_likedUser].likedUsers[msg.sender]) {
+            matches[msg.sender][_likedUser] = true;
+            matches[_likedUser][msg.sender] = true;
+            emit Matched(msg.sender, _likedUser);
+        }
+    }
+    
+    function checkLoveTokenBalance(address account) external view returns (uint256) {
+        return loveToken.balanceOf(account);
+    }
+}
