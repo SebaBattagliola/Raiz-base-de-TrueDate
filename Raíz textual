@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-
+//Contrato similar a función tinder
 contract Tinder {
     // Estructura para representar un perfil de usuario
     struct Profile {
