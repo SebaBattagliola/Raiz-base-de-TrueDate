@@ -23,3 +23,5 @@ blockUser: Permite a los usuarios bloquear a otros usuarios para evitar futuras 
 Estadísticas y análisis:
 getMatchCount: Devuelve el número total de "matches" que ha tenido un usuario.
 generateAnalytics: Genera estadísticas y análisis sobre el uso de la aplicación, como la cantidad de usuarios activos, la tasa de éxito de los "matches", etc.
+
+El smart contract debe ir acompañado de una interfaz con node.js
